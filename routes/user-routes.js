@@ -1,80 +1,67 @@
 import { Router } from "express";
-
-import prisma from "../configs/prismaClient.js";
-import { applyFilters } from "../utils.js";
-
-const router = Router();
+import user from "../models/user-model.js";
+const userRouter = Router();
 
 export const user_fields_tO_send = { email: true, name: true, pk: true };
 
-router.get("/get-all", applyFilters, async (req, res) => {
+userRouter.get("/get-all", async (req, res) => {
   try {
-    const users = await prisma.user.findMany({
-      select: user_fields_tO_send,
-      ...(req.filters || {}),
-    });
+    const users = await user.find();
 
     res.json({ count: users.length, success: true, response: users });
   } catch (error) {
-    // getError(error, res);
-    res.send({ success: false, message: "something went wrong" });
     console.log("error", error);
+    res.status(500).send({ success: false, message: "something went wrong" });
   }
 });
 
-router.get("/get/:pk", async (req, res) => {
-  const { pk } = req.params;
+userRouter.get("/get/:id", async (req, res) => {
+  const { id } = req.params;
   try {
-    const user = await prisma.user.findUnique({
-      where: { pk: +pk },
-      select: user_fields_tO_send,
-    });
-    res.json({ success: true, response: user });
+    const singleUser = await user.findById(id);
+    res.json({ success: true, response: singleUser });
   } catch (error) {
-    // getError(error, res);
-    res.send({ success: false, message: "something went wrong" });
     console.log("error", error);
+    res.status(500).send({ success: false, message: "something went wrong" });
   }
 });
 
-router.post("/create", async (req, res) => {
-  const { name, email, password } = req.body;
+userRouter.post("/create", async (req, res) => {
+  const { username, email, password } = req.body;
   try {
-    const user = await prisma.user.create({ data: { name, email, password } });
-    res.json({ success: true, response: user });
+    const createdUser = await user.create({ username, email, password });
+    res.json({ success: true, response: createdUser });
   } catch (error) {
-    // getError(error, res);
-    res.send({ success: false, message: "something went wrong" });
     console.log("error", error);
+    res.status(500).send({ success: false, message: "something went wrong" });
   }
 });
 
-router.put("/update/:pk", async (req, res) => {
-  const { pk } = req.params;
-  const { name } = req.body;
+userRouter.put("/update/:id", async (req, res) => {
+  const { id } = req.params;
+  const { key, value } = req.body;
   try {
-    const user = await prisma.user.update({
-      where: { pk: +pk },
-      data: { name: name },
-    });
-    res.json({ success: true, response: user });
+    const updatedUser = await user.findByIdAndUpdate(
+      id,
+      { [key]: value },
+      { new: true }
+    );
+    res.json({ success: true, response: updatedUser });
   } catch (error) {
-    // getError(error, res);
-    res.send({ success: false, message: "something went wrong" });
     console.log("error", error);
+    res.status(500).send({ success: false, message: "something went wrong" });
   }
 });
 
-router.delete("/delete/:pk", async (req, res) => {
-  const { pk } = req.params;
+userRouter.delete("/delete/:id", async (req, res) => {
+  const { id } = req.params;
   try {
-    await prisma.user.delete({ where: { pk: +pk } });
-    res.json({ success: true, response: "user deleted successfully" });
+    await user.findByIdAndDelete(id);
+    res.json({ success: true, response: "User deleted successfully!" });
   } catch (error) {
-    // getError(error, res);
-    res.send({ success: false, message: "something went wrong" });
     console.log("error", error);
+    res.status(500).send({ success: false, message: "something went wrong" });
   }
 });
 
-export default router;
+export default userRouter;
