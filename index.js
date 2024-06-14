@@ -12,8 +12,10 @@ import authRouter from "./routes/auth-routes.js";
 
 //configurations
 const app = express();
-app.use(compression({}));
-app.use(cors());
+// app.use(compression({}));
+app.use(cors({ origin: true, methods: "GET,HEAD,PUT,PATCH,POST,DELETE" }));
+app.options("*", cors("*"));
+app.use(cors("*"));
 app.use(express.json());
 dotenv.config({ path: "./.env" });
 connectDatabase();
