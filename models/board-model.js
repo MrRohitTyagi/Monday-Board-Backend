@@ -12,7 +12,7 @@ const boardSchema = new mongoose.Schema(
     ],
     statuses: {
       type: Map,
-      of: new Schema({
+      of: new mongoose.Schema({
         title: { type: String, required: true },
         color: { type: String, required: true },
       }),
@@ -20,13 +20,15 @@ const boardSchema = new mongoose.Schema(
 
     priority: {
       type: Map,
-      of: new Schema({
+      of: new mongoose.Schema({
         title: { type: String, required: true },
         color: { type: String, required: true },
       }),
     },
 
-    sprints: [{ type: Schema.Types.ObjectId, ref: "sprint", default: [] }],
+    sprints: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "sprint", default: [] },
+    ],
   },
   { versionKey: false }
 );
