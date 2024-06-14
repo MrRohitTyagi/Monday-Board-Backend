@@ -1,10 +1,10 @@
 import { Router } from "express";
 import sprint from "../models/sprint-model.js";
-const pulseRouter = Router();
+const sprintRouter = Router();
 
 export const user_fields_tO_send = { email: true, name: true, pk: true };
 
-pulseRouter.get("/get-all", async (req, res) => {
+sprintRouter.get("/get-all", async (req, res) => {
   try {
     const sprints = await sprint.find();
 
@@ -15,10 +15,10 @@ pulseRouter.get("/get-all", async (req, res) => {
   }
 });
 
-pulseRouter.get("/get/:id", async (req, res) => {
+sprintRouter.get("/get/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const singleSprint = await sprint.findById(id);
+    const singleSprint = await sprint.findById(id).populate({ path: "pulses" });
     res.json({ success: true, response: singleSprint });
   } catch (error) {
     console.log("error", error);
@@ -26,7 +26,7 @@ pulseRouter.get("/get/:id", async (req, res) => {
   }
 });
 
-pulseRouter.post("/create", async (req, res) => {
+sprintRouter.post("/create", async (req, res) => {
   const { color, title } = req.body;
   try {
     const createdSprint = await sprint.create({
@@ -40,15 +40,13 @@ pulseRouter.post("/create", async (req, res) => {
   }
 });
 
-pulseRouter.put("/update/:id", async (req, res) => {
+sprintRouter.put("/update/:id", async (req, res) => {
   const { id } = req.params;
-  const { key, value } = req.body;
+  const body = req.body;
   try {
-    const updatedSprint = await sprint.findByIdAndUpdate(
-      id,
-      { [key]: value },
-      { new: true }
-    );
+    const updatedSprint = await sprint.findByIdAndUpdate(id, body, {
+      new: true,
+    });
     res.json({ success: true, response: updatedSprint });
   } catch (error) {
     console.log("error", error);
@@ -56,7 +54,7 @@ pulseRouter.put("/update/:id", async (req, res) => {
   }
 });
 
-pulseRouter.delete("/delete/:id", async (req, res) => {
+sprintRouter.delete("/delete/:id", async (req, res) => {
   const { id } = req.params;
   try {
     await sprint.findByIdAndDelete(id);
@@ -67,4 +65,4 @@ pulseRouter.delete("/delete/:id", async (req, res) => {
   }
 });
 
-export default pulseRouter;
+export default sprintRouter;

@@ -12,7 +12,7 @@ const pulseSchema = new mongoose.Schema(
       },
     ],
     status: { type: String },
-    timeline: { start: String, end: String },
+    timeline: { start: String, end: String, default: {} },
     tag: { type: String },
   },
   { versionKey: false }

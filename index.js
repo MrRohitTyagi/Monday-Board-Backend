@@ -8,6 +8,7 @@ import boardRouter from "./routes/board-routes.js";
 import sprintRouter from "./routes/sprint-routes.js";
 import pulseRouter from "./routes/pulse-routes.js";
 import connectDatabase from "./configs/db.js";
+import authRouter from "./routes/auth-routes.js";
 
 //configurations
 const app = express();
@@ -25,6 +26,7 @@ app.use("/user/", userRouter);
 app.use("/board/", boardRouter);
 app.use("/pulse/", pulseRouter);
 app.use("/sprint/", sprintRouter);
+app.use("/auth/", authRouter);
 
 app.listen(5000, () => {
   console.log("server running at port 5000");

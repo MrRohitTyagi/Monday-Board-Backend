@@ -18,7 +18,7 @@ userRouter.get("/get-all", async (req, res) => {
 userRouter.get("/get/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const singleUser = await user.findById(id);
+    const singleUser = await user.findById(id).populate("boards");
     res.json({ success: true, response: singleUser });
   } catch (error) {
     console.log("error", error);
@@ -39,13 +39,9 @@ userRouter.post("/create", async (req, res) => {
 
 userRouter.put("/update/:id", async (req, res) => {
   const { id } = req.params;
-  const { key, value } = req.body;
+  const body = req.body;
   try {
-    const updatedUser = await user.findByIdAndUpdate(
-      id,
-      { [key]: value },
-      { new: true }
-    );
+    const updatedUser = await user.findByIdAndUpdate(id, body, { new: true });
     res.json({ success: true, response: updatedUser });
   } catch (error) {
     console.log("error", error);
