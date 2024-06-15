@@ -17,8 +17,12 @@ userRouter.get("/get-all", async (req, res) => {
 
 userRouter.get("/get/:id", async (req, res) => {
   const { id } = req.params;
+  const user_id = req?.user?._id;
   try {
-    const singleUser = await user.findById(id).populate("boards");
+    const singleUser = await user
+      .findById(user_id || id)
+      .populate("boards")
+      .select("-password");
     res.json({ success: true, response: singleUser });
   } catch (error) {
     console.log("error", error);
@@ -28,6 +32,7 @@ userRouter.get("/get/:id", async (req, res) => {
 
 userRouter.post("/create", async (req, res) => {
   const { username, email, password } = req.body;
+
   try {
     const createdUser = await user.create({ username, email, password });
     res.json({ success: true, response: createdUser });
@@ -40,8 +45,11 @@ userRouter.post("/create", async (req, res) => {
 userRouter.put("/update/:id", async (req, res) => {
   const { id } = req.params;
   const body = req.body;
+  const user_id = req?.user?._id;
   try {
-    const updatedUser = await user.findByIdAndUpdate(id, body, { new: true });
+    const updatedUser = await user.findByIdAndUpdate(user_id || id, body, {
+      new: true,
+    });
     res.json({ success: true, response: updatedUser });
   } catch (error) {
     console.log("error", error);

@@ -9,11 +9,11 @@ export const user_fields_tO_send = { email: true, name: true, pk: true };
 authRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await userModel.findOne({ email: email });
+    let user = await userModel.findOne({ email: email });
 
     if (!user) {
       return res.json({
-        success: true,
+        success: false,
         message: "User not found, please check your credentials and try again",
       });
     }
@@ -29,11 +29,16 @@ authRouter.post("/login", async (req, res) => {
         message: "Password does not match, Please enter the corrent password",
       });
     }
+    user = user.toObject();
+    delete user.password;
+
+    const token = generateToken(user);
 
     return res.json({
-      success: false,
-      response: user.toObject(),
+      success: true,
+      response: user,
       message: "Login Successfull!",
+      token: token,
     });
   } catch (error) {
     console.log("error", error);

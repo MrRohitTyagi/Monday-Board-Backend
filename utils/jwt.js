@@ -9,7 +9,7 @@ export function generateToken(payload) {
   return token;
 }
 
-export function VerifyToken(token) {
+export function VerifyToken(req, res, next) {
   try {
     return jwt.verify(token, signature);
   } catch (error) {

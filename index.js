@@ -1,5 +1,5 @@
 import express from "express";
-import compression from "compression";
+// import compression from "compression";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -9,6 +9,7 @@ import sprintRouter from "./routes/sprint-routes.js";
 import pulseRouter from "./routes/pulse-routes.js";
 import connectDatabase from "./configs/db.js";
 import authRouter from "./routes/auth-routes.js";
+import { attachUserToheaders } from "./utils.js";
 
 //configurations
 const app = express();
@@ -19,6 +20,9 @@ app.use(cors("*"));
 app.use(express.json());
 dotenv.config({ path: "./.env" });
 connectDatabase();
+
+// middleware
+app.use(attachUserToheaders);
 
 app.get("/", (req, res) => {
   res.send("hello");
