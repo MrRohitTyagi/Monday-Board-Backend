@@ -11,7 +11,10 @@ userRouter.get("/get-all", async (req, res) => {
     res.json({ count: users.length, success: true, response: users });
   } catch (error) {
     console.log("error", error);
-    res.status(500).send({ success: false, message: "something went wrong" });
+    res.status(500).send({
+      success: false,
+      message: error.message || "something went wrong",
+    });
   }
 });
 
@@ -26,7 +29,10 @@ userRouter.get("/get/:id", async (req, res) => {
     res.json({ success: true, response: singleUser });
   } catch (error) {
     console.log("error", error);
-    res.status(500).send({ success: false, message: "something went wrong" });
+    res.status(500).send({
+      success: false,
+      message: error.message || "something went wrong",
+    });
   }
 });
 
@@ -38,7 +44,10 @@ userRouter.post("/create", async (req, res) => {
     res.json({ success: true, response: createdUser });
   } catch (error) {
     console.log("error", error);
-    res.status(500).send({ success: false, message: "something went wrong" });
+    res.status(500).send({
+      success: false,
+      message: error.message || "something went wrong",
+    });
   }
 });
 
@@ -53,7 +62,10 @@ userRouter.put("/update/:id", async (req, res) => {
     res.json({ success: true, response: updatedUser });
   } catch (error) {
     console.log("error", error);
-    res.status(500).send({ success: false, message: "something went wrong" });
+    res.status(500).send({
+      success: false,
+      message: error.message || "something went wrong",
+    });
   }
 });
 
@@ -64,7 +76,10 @@ userRouter.delete("/delete/:id", async (req, res) => {
     res.json({ success: true, response: "User deleted successfully!" });
   } catch (error) {
     console.log("error", error);
-    res.status(500).send({ success: false, message: "something went wrong" });
+    res.status(500).send({
+      success: false,
+      message: error.message || "something went wrong",
+    });
   }
 });
 

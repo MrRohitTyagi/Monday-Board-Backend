@@ -10,6 +10,7 @@ import pulseRouter from "./routes/pulse-routes.js";
 import connectDatabase from "./configs/db.js";
 import authRouter from "./routes/auth-routes.js";
 import { attachUserToheaders } from "./utils.js";
+import { VerifyToken } from "./utils/jwt.js";
 
 //configurations
 const app = express();
@@ -28,11 +29,11 @@ app.get("/", (req, res) => {
   res.send("hello");
 });
 
-app.use("/user/", userRouter);
-app.use("/board/", boardRouter);
-app.use("/pulse/", pulseRouter);
-app.use("/sprint/", sprintRouter);
 app.use("/auth/", authRouter);
+app.use("/user/", VerifyToken, userRouter);
+app.use("/board/", VerifyToken, boardRouter);
+app.use("/pulse/", VerifyToken, pulseRouter);
+app.use("/sprint/", VerifyToken, sprintRouter);
 
 app.listen(5000, () => {
   console.log("server running at port 5000");

@@ -11,7 +11,9 @@ export function generateToken(payload) {
 
 export function VerifyToken(req, res, next) {
   try {
-    return jwt.verify(token, signature);
+    const token = req.headers["authorization"];
+    jwt.verify(token, signature);
+    next();
   } catch (error) {
     const customError = new Error("Session Expired");
     customError.code = 401;
