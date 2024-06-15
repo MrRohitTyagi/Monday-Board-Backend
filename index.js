@@ -21,9 +21,9 @@ app.use(cors("*"));
 app.use(express.json());
 dotenv.config({ path: "./.env" });
 connectDatabase();
+console.clear()
 
 // middleware
-app.use(attachUserToheaders);
 
 app.get("/", (req, res) => {
   res.send("hello");
