@@ -28,7 +28,7 @@ pulseRouter.get("/get/:id", async (req, res) => {
 });
 
 pulseRouter.post("/create", async (req, res) => {
-  const { priority, status, tag, timeline, title, sprintID } = req.body;
+  const { priority, status, tag, timeline, title, sprint: sprintID } = req.body;
   try {
     const createdPulse = await pulse.create({
       priority,
@@ -50,13 +50,9 @@ pulseRouter.post("/create", async (req, res) => {
 
 pulseRouter.put("/update/:id", async (req, res) => {
   const { id } = req.params;
-  const { key, value } = req.body;
+  const body = req.body;
   try {
-    const updatedPulse = await pulse.findByIdAndUpdate(
-      id,
-      { [key]: value },
-      { new: true }
-    );
+    const updatedPulse = await pulse.findByIdAndUpdate(id, body, { new: true });
     res.json({ success: true, response: updatedPulse });
   } catch (error) {
     console.log("error", error);
