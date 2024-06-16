@@ -1,5 +1,6 @@
 import { Router } from "express";
 import board from "../models/board-model.js";
+import userModel from "../models/user-model.js";
 const boardRouter = Router();
 
 export const user_fields_tO_send = { email: true, name: true, pk: true };
@@ -27,13 +28,18 @@ boardRouter.get("/get/:id", async (req, res) => {
 });
 
 boardRouter.post("/create", async (req, res) => {
-  const { description, picture, title } = req.body;
+  const { description, picture, title, admins = [] } = req.body;
   try {
     const createdBoard = await board.create({
       description,
       picture,
       title,
+      admins,
     });
+    const user = await userModel.findById([admins[0]]);
+    user.boards = [...user.boards, createdBoard._id.toString()];
+    await user.save();
+
     res.json({ success: true, response: createdBoard });
   } catch (error) {
     console.log("error", error);
