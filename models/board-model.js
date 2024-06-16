@@ -15,12 +15,16 @@ const boardSchema = new mongoose.Schema(
       of: new mongoose.Schema({
         title: { type: String, required: true },
         color: { type: String, required: true },
+        textColor: { type: String, required: true },
+        id: { type: String, required: true },
       }),
     },
 
     priority: {
       type: Map,
       of: new mongoose.Schema({
+        textColor: { type: String, required: true },
+        id: { type: String, required: true },
         title: { type: String, required: true },
         color: { type: String, required: true },
       }),

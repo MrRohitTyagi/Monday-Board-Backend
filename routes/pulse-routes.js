@@ -1,5 +1,6 @@
 import { Router } from "express";
 import pulse from "../models/pulse-model.js";
+import sprintModel from "../models/sprint-model.js";
 const pulseRouter = Router();
 
 export const user_fields_tO_send = { email: true, name: true, pk: true };
@@ -27,7 +28,7 @@ pulseRouter.get("/get/:id", async (req, res) => {
 });
 
 pulseRouter.post("/create", async (req, res) => {
-  const { priority, status, tag, timeline, title } = req.body;
+  const { priority, status, tag, timeline, title, sprintID } = req.body;
   try {
     const createdPulse = await pulse.create({
       priority,
@@ -36,6 +37,10 @@ pulseRouter.post("/create", async (req, res) => {
       timeline,
       title,
     });
+    const sprint = await sprintModel.findById(sprintID);
+    sprint.pulses = [...sprint.pulses, createdPulse._id.toString()];
+    await sprint.save();
+
     res.json({ success: true, response: createdPulse });
   } catch (error) {
     console.log("error", error);

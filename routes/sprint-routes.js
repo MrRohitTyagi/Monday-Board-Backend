@@ -1,5 +1,6 @@
 import { Router } from "express";
 import sprint from "../models/sprint-model.js";
+import boardModel from "../models/board-model.js";
 const sprintRouter = Router();
 
 export const user_fields_tO_send = { email: true, name: true, pk: true };
@@ -27,12 +28,15 @@ sprintRouter.get("/get/:id", async (req, res) => {
 });
 
 sprintRouter.post("/create", async (req, res) => {
-  const { color, title } = req.body;
+  const { color, title, board: boardID } = req.body;
   try {
     const createdSprint = await sprint.create({
       color,
       title,
     });
+    const board = await boardModel.findById(boardID);
+    board.sprints = [createdSprint._id.toString(), ...board.sprints];
+    await board.save();
     res.json({ success: true, response: createdSprint });
   } catch (error) {
     console.log("error", error);
