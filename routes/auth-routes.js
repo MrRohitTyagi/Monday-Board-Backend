@@ -6,7 +6,7 @@ const authRouter = Router();
 
 export const user_fields_tO_send = { email: true, name: true, pk: true };
 
-authRouter.post("/login", async (req, res) => {
+authRouter.post("/login", async (req, res, next) => {
   const { email, password } = req.body;
   try {
     let user = await userModel.findOne({ email: email });
@@ -23,8 +23,10 @@ authRouter.post("/login", async (req, res) => {
       user.toObject().password
     );
 
+    console.log({ isPassSame, password, user });
+
     if (isPassSame === false) {
-      return res.json({
+      return res.status(409).json({
         success: false,
         message: "Password does not match, Please enter the corrent password",
       });
@@ -41,11 +43,11 @@ authRouter.post("/login", async (req, res) => {
       token: token,
     });
   } catch (error) {
-    console.log("error", error);
-    res.status(500).send({ success: false, message: "something went wrong" });
+    next();
   }
 });
-authRouter.post("/signup", async (req, res) => {
+
+authRouter.post("/signup", async (req, res, next) => {
   const { username, email, password, org, picture } = req.body;
   try {
     let user = await userModel.create({
@@ -62,8 +64,7 @@ authRouter.post("/signup", async (req, res) => {
     const token = generateToken(user);
     res.json({ success: true, response: user, token });
   } catch (error) {
-    console.log("error", error);
-    res.status(500).send({ success: false, message: "something went wrong" });
+    next(error);
   }
 });
 

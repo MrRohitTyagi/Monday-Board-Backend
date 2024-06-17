@@ -11,6 +11,7 @@ import connectDatabase from "./configs/db.js";
 import authRouter from "./routes/auth-routes.js";
 import { attachUserToheaders } from "./utils.js";
 import { VerifyToken } from "./utils/jwt.js";
+import errorHandler from "./middlewares/errorhandeling.js";
 
 //configurations
 const app = express();
@@ -21,7 +22,7 @@ app.use(cors("*"));
 app.use(express.json());
 dotenv.config({ path: "./.env" });
 connectDatabase();
-console.clear()
+console.clear();
 
 // middleware
 
@@ -34,6 +35,8 @@ app.use("/user/", VerifyToken, userRouter);
 app.use("/board/", VerifyToken, boardRouter);
 app.use("/pulse/", VerifyToken, pulseRouter);
 app.use("/sprint/", VerifyToken, sprintRouter);
+
+app.use(errorHandler);
 
 app.listen(5000, () => {
   console.log("server running at port 5000");

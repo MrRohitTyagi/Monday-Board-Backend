@@ -12,10 +12,9 @@ export function generateToken(payload) {
 export function VerifyToken(req, res, next) {
   try {
     const token = req.headers["authorization"];
-    if (!token) {
-      const customError = new Error("User Not Authorized");
-      customError.code = 401;
-      throw customError;
+    console.log("token", token);
+    if (!token || token === "undefined") {
+      throw new Error();
     }
     const user = jwt.verify(token, signature);
     if (user) {
@@ -23,9 +22,9 @@ export function VerifyToken(req, res, next) {
     }
     next();
   } catch (error) {
-    console.log("error", error);
-    const customError = new Error("Session Expired");
-    customError.code = 401;
-    throw customError;
+    res.status(401).send({
+      message: "Session Expired. Please login again",
+      success: false,
+    });
   }
 }
