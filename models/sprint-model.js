@@ -6,6 +6,11 @@ const sprintSchema = new mongoose.Schema(
     pulses: [
       { type: mongoose.Schema.Types.ObjectId, ref: "pulse", default: [] },
     ],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      immutable: true,
+    },
   },
   { versionKey: false }
 );

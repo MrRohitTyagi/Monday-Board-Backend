@@ -33,6 +33,11 @@ const boardSchema = new mongoose.Schema(
     sprints: [
       { type: mongoose.Schema.Types.ObjectId, ref: "sprint", default: [] },
     ],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      immutable: true,
+    },
   },
   { versionKey: false }
 );

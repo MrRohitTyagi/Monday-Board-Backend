@@ -14,6 +14,11 @@ const userSchema = new mongoose.Schema(
     picture: { type: String },
     org: { type: String },
     boards: [{ ref: "board", type: mongoose.Schema.ObjectId, default: [] }],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      immutable: true,
+    },
   },
   { versionKey: false }
 );
