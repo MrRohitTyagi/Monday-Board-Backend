@@ -1,5 +1,6 @@
 // middlewares/errorHandler.js
 function errorHandler(err, req, res, next) {
+  console.log(err);
   if (err.name === "ValidationError") {
     // Mongoose validation error
     return res

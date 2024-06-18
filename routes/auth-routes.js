@@ -62,7 +62,12 @@ authRouter.post("/signup", async (req, res, next) => {
     delete user.password;
 
     const token = generateToken(user);
-    res.json({ success: true, response: user, token });
+    res.json({
+      success: true,
+      response: user,
+      token,
+      message: "SignUp successfull",
+    });
   } catch (error) {
     next(error);
   }

@@ -9,7 +9,6 @@ import sprintRouter from "./routes/sprint-routes.js";
 import pulseRouter from "./routes/pulse-routes.js";
 import connectDatabase from "./configs/db.js";
 import authRouter from "./routes/auth-routes.js";
-import { attachUserToheaders } from "./utils.js";
 import { VerifyToken } from "./utils/jwt.js";
 import errorHandler from "./middlewares/errorhandeling.js";
 
@@ -20,7 +19,7 @@ app.use(cors({ origin: true, methods: "GET,HEAD,PUT,PATCH,POST,DELETE" }));
 app.options("*", cors("*"));
 app.use(cors("*"));
 app.use(express.json());
-dotenv.config({ path: "./.env" });
+dotenv.config({ path: "./.env.local" });
 connectDatabase();
 console.clear();
 

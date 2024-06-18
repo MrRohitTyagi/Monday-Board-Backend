@@ -28,15 +28,11 @@ boardRouter.get("/get/:id", async (req, res) => {
 });
 
 boardRouter.post("/create", async (req, res) => {
-  const { description, picture, title, admins = [] } = req.body;
+  const body = req.body;
   try {
-    const createdBoard = await board.create({
-      description,
-      picture,
-      title,
-      admins,
-    });
-    const user = await userModel.findById([admins[0]]);
+    const createdBoard = await board.create(body);
+
+    const user = await userModel.findById([createdBoard.admins[0]]);
     user.boards = [...user.boards, createdBoard._id.toString()];
     await user.save();
 
