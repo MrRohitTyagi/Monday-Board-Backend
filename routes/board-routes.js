@@ -19,7 +19,11 @@ boardRouter.get("/get-all", async (req, res) => {
 boardRouter.get("/get/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const singleBoard = await board.findById(id);
+    const singleBoard = await board.findById(id).populate([
+      { path: "admins", select: "_id picture username" },
+      { path: "members", select: "_id picture username" },
+    ]);
+
     res.json({ success: true, response: singleBoard });
   } catch (error) {
     console.log("error", error);
