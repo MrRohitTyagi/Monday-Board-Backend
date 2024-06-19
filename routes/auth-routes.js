@@ -14,7 +14,7 @@ authRouter.post("/login", async (req, res, next) => {
     let user = await userModel.findOne({ email: email });
 
     if (!user) {
-      return res.json({
+      return res.status(409).json({
         success: false,
         message: "User not found, please check your credentials and try again",
       });
