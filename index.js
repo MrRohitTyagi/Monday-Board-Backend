@@ -7,10 +7,14 @@ import userRouter from "./routes/user-routes.js";
 import boardRouter from "./routes/board-routes.js";
 import sprintRouter from "./routes/sprint-routes.js";
 import pulseRouter from "./routes/pulse-routes.js";
+import emailRouter from "./routes/email-otp-routes.js";
+
 import connectDatabase from "./configs/db.js";
 import authRouter from "./routes/auth-routes.js";
+
 import { VerifyToken } from "./utils/jwt.js";
 import errorHandler from "./middlewares/errorhandeling.js";
+import invitationRouter from "./routes/invitation-router.js";
 
 //configurations
 const app = express();
@@ -29,6 +33,8 @@ app.get("/", (req, res) => {
   res.send("hello");
 });
 
+app.use("/email/", emailRouter);
+app.use("/invitation/", invitationRouter);
 app.use("/auth/", authRouter);
 app.use("/user/", VerifyToken, userRouter);
 app.use("/board/", VerifyToken, boardRouter);

@@ -24,8 +24,9 @@ userRouter.get("/get/:id", async (req, res) => {
   try {
     const singleUser = await user
       .findById(user_id || id)
-      .populate("boards")
+      .populate([{ path: "boards", select: "_id picture title" }])
       .select("-password");
+
     res.json({ success: true, response: singleUser });
   } catch (error) {
     console.log("error", error);

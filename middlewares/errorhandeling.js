@@ -3,17 +3,15 @@ function errorHandler(err, req, res, next) {
   console.log(err);
   if (err.name === "ValidationError") {
     // Mongoose validation error
-    return res
-      .status(400)
-      .json({
-        message: "Validation Error",
-        errors: err.errors,
-        success: false,
-      });
+    return res.status(400).json({
+      message: "Validation Error",
+      errors: err.errors,
+      success: false,
+    });
   } else if (err.code === 11000) {
     // Duplicate key error
     return res
-      .status(409)
+      .status(400)
       .json({ message: "Email already exists", success: false });
   } else {
     // General or unknown error
@@ -24,5 +22,19 @@ function errorHandler(err, req, res, next) {
     });
   }
 }
+
+function throwEarlyError({
+  res,
+  message = "Something went wrong",
+  extra = {},
+  status = 400,
+}) {
+  return res.status(status).json({
+    success: false,
+    message,
+    ...extra,
+  });
+}
+export { throwEarlyError };
 
 export default errorHandler;
