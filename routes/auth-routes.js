@@ -1,5 +1,7 @@
 import { Router } from "express";
 import userModel from "../models/user-model.js";
+import boardModel from "../models/board-model.js";
+
 import { comparePassword } from "../utils/bcrypt.js";
 import { generateToken } from "../utils/jwt.js";
 const authRouter = Router();
@@ -7,7 +9,7 @@ const authRouter = Router();
 export const user_fields_tO_send = { email: true, name: true, pk: true };
 
 authRouter.post("/login", async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, board: boardID } = req.body;
   try {
     let user = await userModel.findOne({ email: email });
 
@@ -23,13 +25,19 @@ authRouter.post("/login", async (req, res, next) => {
       user.toObject().password
     );
 
-    console.log({ isPassSame, password, user });
+    console.log({ isPassSame, password, user, boardID });
 
     if (isPassSame === false) {
       return res.status(409).json({
         success: false,
         message: "Password does not match, Please enter the corrent password",
       });
+    }
+
+    if (boardID) {
+      user.boards = [boardID, ...user.boards];
+      await user.save();
+      await addMemberToBoard(boardID, user._id.toString());
     }
     user = user.toObject();
     delete user.password;
@@ -43,21 +51,26 @@ authRouter.post("/login", async (req, res, next) => {
       token: token,
     });
   } catch (error) {
+    console.log("error", error);
     next();
   }
 });
 
 authRouter.post("/signup", async (req, res, next) => {
-  const { username, email, password, org, picture } = req.body;
+  const { username, email, password, org, picture, board: boardID } = req.body;
   try {
-    let user = await userModel.create({
-      username,
-      email,
-      password,
-      org,
-      picture,
-    });
+    const payload = { username, email, password, org, picture };
 
+    if (boardID) {
+      //used in invitation
+      payload.boards = [boardID];
+    }
+
+    let user = await userModel.create(payload);
+
+    if (boardID) {
+      await addMemberToBoard(boardID, user._id.toString());
+    }
     user = user.toObject();
     delete user.password;
 
@@ -72,5 +85,11 @@ authRouter.post("/signup", async (req, res, next) => {
     next(error);
   }
 });
+
+async function addMemberToBoard(boardID, userToadd) {
+  const board = await boardModel.findById(boardID);
+  board.members = board.members.concat(userToadd);
+  await board.save();
+}
 
 export default authRouter;
