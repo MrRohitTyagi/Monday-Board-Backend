@@ -98,7 +98,7 @@ invitationRouter.post("/invite-accept", async (req, res, next) => {
     return res.json({
       success: true,
       response: finalRes,
-      message: `Your are not a member of ${board.toObject().title}`,
+      message: `Your are now a member of ${board.toObject().title}`,
     });
   } catch (error) {
     console.log("error", error);
