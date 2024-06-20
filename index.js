@@ -15,6 +15,7 @@ import authRouter from "./routes/auth-routes.js";
 import { VerifyToken } from "./utils/jwt.js";
 import errorHandler from "./middlewares/errorhandeling.js";
 import invitationRouter from "./routes/invitation-router.js";
+import chatRouter from "./routes/chat-routes.js";
 
 //configurations
 const app = express();
@@ -36,9 +37,15 @@ app.get("/", (req, res) => {
 app.use("/email/", emailRouter);
 app.use("/invitation/", invitationRouter);
 app.use("/auth/", authRouter);
+
 app.use("/user/", VerifyToken, userRouter);
 app.use("/board/", VerifyToken, boardRouter);
 app.use("/pulse/", VerifyToken, pulseRouter);
+app.use(
+  "/chat/",
+  //  VerifyToken,
+  chatRouter
+);
 app.use("/sprint/", VerifyToken, sprintRouter);
 
 app.use(errorHandler);
