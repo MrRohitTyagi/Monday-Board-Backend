@@ -1,7 +1,9 @@
 import express from "express";
 
 import { sendMail } from "../utils/email.js";
+
 import OTP from "../models/otp-Model.js";
+import invitationModel from "../models/invitation-model.js";
 
 import fs from "fs";
 import path from "path";
@@ -59,23 +61,31 @@ emailRouter.post("/send-invite", async (req, res, next) => {
       to = "",
       extra = "",
       from = "",
-      board: boardID = "",
+      board: board_id = "",
       board_name = "",
     } = req.body;
 
-    if (!to || !boardID) {
+    if (!to || !board_id) {
       return res.status(400).json({
         message: !to ? "Email is required" : "Board is required",
         success: false,
       });
     }
 
+    const invitation = await invitationModel.create({
+      board_id: board_id,
+      board_name: board_name,
+      extra: extra,
+      from: from,
+      to: to,
+    });
+    // return res.send();
     let htmlTemplate = fs.readFileSync(
       path.join(__dirname, "../utils/emailTemplate.html"),
       "utf-8"
     );
 
-    const url = `${feUrl}invite?board_id=${boardID}&email=${to}&invited_by=${from}&board_name=${board_name}&extra=${extra}`;
+    const url = `${feUrl}invite?invitation_id=${invitation._id}`;
 
     htmlTemplate = htmlTemplate
       .replace("${from}", from)

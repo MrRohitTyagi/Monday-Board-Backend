@@ -6,6 +6,7 @@ import { comparePassword } from "../utils/bcrypt.js";
 import { generateToken } from "../utils/jwt.js";
 
 import { throwEarlyError } from "../middlewares/errorhandeling.js";
+import invitationModel from "../models/invitation-model.js";
 const invitationRouter = Router();
 
 export const user_fields_tO_send = { email: true, name: true, pk: true };
@@ -14,6 +15,7 @@ invitationRouter.post("/invite-accept", async (req, res, next) => {
   const {
     user_id,
     board_id,
+    invitation_id,
     //create user params
     username,
     email,
@@ -80,12 +82,7 @@ invitationRouter.post("/invite-accept", async (req, res, next) => {
 
     board.members = board.members.concat(user._id.toString());
 
-    let [updatedBoard, updatedUser] = await Promise.all([
-      board.save(),
-      user.save(),
-    ]);
-
-    const { password: _pass, ...userDataToSend } = updatedUser.toObject();
+    let [updatedBoard] = await Promise.all([board.save(), user.save()]);
 
     const boardDataToSend = {
       picture: updatedBoard.picture,
@@ -94,8 +91,9 @@ invitationRouter.post("/invite-accept", async (req, res, next) => {
     };
 
     const finalRes = { board: boardDataToSend };
-    if (!user_id) finalRes.user = userDataToSend;
     if (token) finalRes.token = token;
+
+    await invitationModel.findByIdAndDelete(invitation_id);
 
     return res.json({
       success: true,
@@ -105,6 +103,31 @@ invitationRouter.post("/invite-accept", async (req, res, next) => {
   } catch (error) {
     console.log("error", error);
     next();
+  }
+});
+
+invitationRouter.get("/get/:id", async (req, res) => {
+  const initiation_id = req.params.id;
+  try {
+    const invitation = await invitationModel.findById(initiation_id);
+
+    if (!invitation) {
+      return throwEarlyError({
+        res,
+        message:
+          "Invitation has either expired or does not exist. Please ask your board admin for a re-invitation.",
+      });
+    }
+    return res.json({
+      success: true,
+      response: invitation,
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Something went Wrong",
+    });
   }
 });
 

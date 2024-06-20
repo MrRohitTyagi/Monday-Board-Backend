@@ -1,9 +1,9 @@
 import { Router } from "express";
 import userModel from "../models/user-model.js";
-import boardModel from "../models/board-model.js";
 
 import { comparePassword } from "../utils/bcrypt.js";
 import { generateToken } from "../utils/jwt.js";
+
 const authRouter = Router();
 
 export const user_fields_tO_send = { email: true, name: true, pk: true };
