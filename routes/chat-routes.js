@@ -19,6 +19,7 @@ chatRouter.get("/get/:pulse_id", async (req, res, next) => {
   try {
     const chatsBelongsToAPulse = await chatModel
       .find({ pulseId: pulse_id })
+      .sort({ createdAt: -1 })
       .populate([
         {
           path: "thread",
@@ -35,7 +36,7 @@ chatRouter.get("/get/:pulse_id", async (req, res, next) => {
 chatRouter.post("/create", async (req, res, next) => {
   const { content, draft, pulseId, seenBy, thread, createdBy } = req.body;
   try {
-    const createdChat = await chatModel.create({
+    let createdChat = await chatModel.create({
       content,
       draft,
       pulseId,
@@ -43,6 +44,14 @@ chatRouter.post("/create", async (req, res, next) => {
       thread,
       createdBy,
     });
+
+    createdChat = await createdChat.populate([
+      {
+        path: "thread",
+        populate: { path: "createdBy", select: "username picture _id" },
+      },
+      { path: "createdBy", select: "username picture _id" },
+    ]);
 
     res.json({ success: true, response: createdChat });
   } catch (error) {
