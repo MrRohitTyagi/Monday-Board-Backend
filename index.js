@@ -26,7 +26,6 @@ app.use(cors("*"));
 app.use(express.json());
 dotenv.config({ path: "./.env.local" });
 connectDatabase();
-console.clear();
 
 // middleware
 
@@ -41,15 +40,12 @@ app.use("/auth/", authRouter);
 app.use("/user/", VerifyToken, userRouter);
 app.use("/board/", VerifyToken, boardRouter);
 app.use("/pulse/", VerifyToken, pulseRouter);
-app.use(
-  "/chat/",
-  //  VerifyToken,
-  chatRouter
-);
+app.use("/chat/", VerifyToken, chatRouter);
 app.use("/sprint/", VerifyToken, sprintRouter);
 
 app.use(errorHandler);
 
 app.listen(5000, () => {
+  console.clear();
   console.log("server running at port 5000");
 });

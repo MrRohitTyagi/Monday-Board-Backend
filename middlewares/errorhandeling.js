@@ -1,6 +1,6 @@
 // middlewares/errorHandler.js
 function errorHandler(err, req, res, next) {
-  console.log(err);
+  console.log("error=>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", err);
   if (err.name === "ValidationError") {
     // Mongoose validation error
     return res.status(400).json({
@@ -16,8 +16,7 @@ function errorHandler(err, req, res, next) {
   } else {
     // General or unknown error
     return res.status(500).json({
-      message: "Internal Server Error",
-      error: err.message,
+      message: err?.message || "Internal Server Error, please try again later",
       success: false,
     });
   }

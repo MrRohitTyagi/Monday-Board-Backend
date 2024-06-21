@@ -12,7 +12,6 @@ export function generateToken(payload) {
 export function VerifyToken(req, res, next) {
   try {
     const token = req.headers["authorization"];
-    console.log("token", token);
     if (!token || token === "undefined") {
       throw new Error();
     }

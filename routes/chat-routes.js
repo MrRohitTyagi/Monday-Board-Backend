@@ -35,12 +35,15 @@ chatRouter.get("/get/:pulse_id", async (req, res, next) => {
 
 chatRouter.post("/create", async (req, res, next) => {
   const { content, draft, pulseId, seenBy, thread, createdBy } = req.body;
+
+  const user_id = req.user._id;
+
   try {
     let createdChat = await chatModel.create({
       content,
       draft,
       pulseId,
-      seenBy,
+      seenBy: [user_id],
       thread,
       createdBy,
     });
@@ -51,6 +54,7 @@ chatRouter.post("/create", async (req, res, next) => {
         populate: { path: "createdBy", select: "username picture _id" },
       },
       { path: "createdBy", select: "username picture _id" },
+      { path: "seenBy", select: "username picture _id" },
     ]);
 
     res.json({ success: true, response: createdChat });

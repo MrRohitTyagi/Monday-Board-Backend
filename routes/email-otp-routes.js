@@ -103,8 +103,7 @@ emailRouter.post("/send-invite", async (req, res, next) => {
       message: "Invite sent successfully",
     });
   } catch (error) {
-    console.log("error", error);
-    next();
+    next(error);
   }
 });
 export default emailRouter;

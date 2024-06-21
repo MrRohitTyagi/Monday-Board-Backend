@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-dotenv.config({ path: "../.env.local" });
+dotenv.config({ path: ".env.local" });
 
 const EMAIL = process.env.EMAIL;
 const PASSWORD = process.env.PASSWORD;
@@ -24,7 +24,7 @@ export const sendMail = async ({ to, subject, text, html }) => {
     });
     return info;
   } catch (error) {
+    throw new Error(error);
     console.log(error);
-    res.status(400).send("ni gya");
   }
 };
