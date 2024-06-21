@@ -63,14 +63,15 @@ chatRouter.post("/create", async (req, res, next) => {
   }
 });
 
-chatRouter.put("/update/:id", async (req, res, next) => {
-  const { id } = req.params;
+chatRouter.put("/update/:_id", async (req, res, next) => {
+  const { _id } = req.params;
   const body = req.body;
+  console.log("body", body);
   try {
-    const updatedChat = await chatModel.findByIdAndUpdate(id, body, {
+    const updatedChat = await chatModel.findByIdAndUpdate(_id, body, {
       new: true,
     });
-    res.json({ success: true, response: updatedChat });
+    res.json({ success: true, response: updatedChat.toObject() });
   } catch (error) {
     next(error);
   }
