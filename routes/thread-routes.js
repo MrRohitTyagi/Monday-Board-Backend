@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import threadModel from "../models/thread-model.js";
+import chatModel from "../models/chat-model.js";
 
 const threadsRouter = Router();
 
@@ -39,6 +40,10 @@ threadsRouter.post("/create", async (req, res, next) => {
       createdBy: [user_id],
     });
 
+    const chat = await chatModel.findById(chat_id);
+    chat.threadCount = chat.threadCount + 1;
+    await chat.save();
+
     createdThread = await createdThread.populate([
       { path: "createdBy", select: "username picture _id" },
     ]);
@@ -67,7 +72,13 @@ threadsRouter.put("/update/:_id", async (req, res, next) => {
 threadsRouter.delete("/delete/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
-    await threadModel.findByIdAndDelete(id);
+    const deletedThread = await threadModel.findByIdAndDelete(id);
+    console.log("deletedThread", deletedThread.toObject());
+
+    const chat = await chatModel.findById(deletedThread.chatId.toString());
+    chat.threadCount = chat.threadCount - 1;
+    await chat.save();
+
     res.json({ success: true, response: "Chat deleted successfully!" });
   } catch (error) {
     next(error);
