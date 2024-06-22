@@ -1,24 +1,24 @@
 import { Router } from "express";
 
-import chatModel from "../models/chat-model.js";
+import threadModel from "../models/thread-model";
 
-const chatRouter = Router();
+const threadsRouter = Router();
 
-chatRouter.get("/get-single/:_id", async (req, res, next) => {
+threadsRouter.get("/get-single/:_id", async (req, res, next) => {
   try {
     const _id = req.params._id;
-    const chat = await chatModel.findById(_id);
+    const thread = await threadModel.findById(_id);
 
-    res.json({ success: true, response: chat });
+    res.json({ success: true, response: thread });
   } catch (error) {
     next(error);
   }
 });
 
-chatRouter.get("/get/:pulse_id", async (req, res, next) => {
+threadsRouter.get("/get/:pulse_id", async (req, res, next) => {
   const { pulse_id } = req.params;
   try {
-    const chatsBelongsToAPulse = await chatModel
+    const threadsBelongsToAChat = await threadModel
       .find({ pulseId: pulse_id })
       .sort({ createdAt: -1 })
       .populate([
@@ -28,19 +28,19 @@ chatRouter.get("/get/:pulse_id", async (req, res, next) => {
         },
         { path: "createdBy", select: "username picture _id" },
       ]);
-    res.json({ success: true, response: chatsBelongsToAPulse });
+    res.json({ success: true, response: threadsBelongsToAChat });
   } catch (error) {
     next(error);
   }
 });
 
-chatRouter.post("/create", async (req, res, next) => {
+threadsRouter.post("/create", async (req, res, next) => {
   const { content, draft, pulseId, seenBy, thread, createdBy } = req.body;
 
   const user_id = req.user._id;
 
   try {
-    let createdChat = await chatModel.create({
+    let createdChat = await threadModel.create({
       content,
       draft,
       pulseId,
@@ -64,12 +64,12 @@ chatRouter.post("/create", async (req, res, next) => {
   }
 });
 
-chatRouter.put("/update/:_id", async (req, res, next) => {
+threadsRouter.put("/update/:_id", async (req, res, next) => {
   const { _id } = req.params;
   const body = req.body;
   console.log("body", body);
   try {
-    const updatedChat = await chatModel.findByIdAndUpdate(_id, body, {
+    const updatedChat = await threadModel.findByIdAndUpdate(_id, body, {
       new: true,
     });
     res.json({ success: true, response: updatedChat.toObject() });
@@ -78,14 +78,14 @@ chatRouter.put("/update/:_id", async (req, res, next) => {
   }
 });
 
-chatRouter.delete("/delete/:id", async (req, res, next) => {
+threadsRouter.delete("/delete/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
-    await chatModel.findByIdAndDelete(id);
+    await threadModel.findByIdAndDelete(id);
     res.json({ success: true, response: "Chat deleted successfully!" });
   } catch (error) {
     next(error);
   }
 });
 
-export default chatRouter;
+export default threadsRouter;
