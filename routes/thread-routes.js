@@ -15,19 +15,12 @@ threadsRouter.get("/get-single/:_id", async (req, res, next) => {
   }
 });
 
-threadsRouter.get("/get/:pulse_id", async (req, res, next) => {
-  const { pulse_id } = req.params;
+threadsRouter.get("/get/:chat_id", async (req, res, next) => {
+  const { chat_id } = req.params;
   try {
     const threadsBelongsToAChat = await threadModel
-      .find({ pulseId: pulse_id })
-      .sort({ createdAt: -1 })
-      .populate([
-        {
-          path: "thread",
-          populate: { path: "createdBy", select: "username picture _id" },
-        },
-        { path: "createdBy", select: "username picture _id" },
-      ]);
+      .find({ chatId: chat_id })
+      .populate([{ path: "createdBy", select: "username picture _id" }]);
     res.json({ success: true, response: threadsBelongsToAChat });
   } catch (error) {
     next(error);
@@ -35,30 +28,22 @@ threadsRouter.get("/get/:pulse_id", async (req, res, next) => {
 });
 
 threadsRouter.post("/create", async (req, res, next) => {
-  const { content, draft, pulseId, seenBy, thread, createdBy } = req.body;
+  const { content, chatId: chat_id } = req.body;
 
   const user_id = req.user._id;
 
   try {
-    let createdChat = await threadModel.create({
+    let createdThread = await threadModel.create({
       content,
-      draft,
-      pulseId,
-      seenBy: [user_id],
-      thread,
-      createdBy,
+      chatId: chat_id,
+      createdBy: [user_id],
     });
 
-    createdChat = await createdChat.populate([
-      {
-        path: "thread",
-        populate: { path: "createdBy", select: "username picture _id" },
-      },
+    createdThread = await createdThread.populate([
       { path: "createdBy", select: "username picture _id" },
-      { path: "seenBy", select: "username picture _id" },
     ]);
 
-    res.json({ success: true, response: createdChat });
+    res.json({ success: true, response: createdThread });
   } catch (error) {
     next(error);
   }
@@ -67,11 +52,12 @@ threadsRouter.post("/create", async (req, res, next) => {
 threadsRouter.put("/update/:_id", async (req, res, next) => {
   const { _id } = req.params;
   const body = req.body;
-  console.log("body", body);
+
   try {
     const updatedChat = await threadModel.findByIdAndUpdate(_id, body, {
       new: true,
     });
+
     res.json({ success: true, response: updatedChat.toObject() });
   } catch (error) {
     next(error);
