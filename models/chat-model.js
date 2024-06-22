@@ -4,17 +4,12 @@ const chatSchema = new mongoose.Schema(
   {
     pulseId: {
       ref: "pulse",
-      required: [true, "Pulse id is required"],
+      required: [true, "Pulse reference is required"],
       type: mongoose.Schema.Types.ObjectId,
     },
 
-    thread: [
-      {
-        ref: "chat",
-        default: [],
-        type: mongoose.Schema.Types.ObjectId,
-      },
-    ],
+    threadCount: { type: Number, default: 0 },
+
     createdBy: {
       ref: "user",
       required: [true, "User is required"],
