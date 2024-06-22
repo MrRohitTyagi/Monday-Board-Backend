@@ -5,6 +5,14 @@ import chatModel from "../models/chat-model.js";
 
 const threadsRouter = Router();
 
+import path from "path";
+import { fileURLToPath } from "url";
+import { Worker } from "worker_threads";
+
+// Convert import.meta.url to __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 threadsRouter.get("/get-single/:_id", async (req, res, next) => {
   try {
     const _id = req.params._id;
@@ -29,7 +37,7 @@ threadsRouter.get("/get/:chat_id", async (req, res, next) => {
 });
 
 threadsRouter.post("/create", async (req, res, next) => {
-  const { content, chatId: chat_id } = req.body;
+  const { content, chatId: chat_id, boardId, pulseId } = req.body;
 
   const user_id = req.user._id;
 
@@ -49,6 +57,21 @@ threadsRouter.post("/create", async (req, res, next) => {
     ]);
 
     res.json({ success: true, response: createdThread });
+
+    ////////////////////WORKER/////////////////////
+    createdThread = await createdThread.toObject();
+
+    createdThread = { ...createdThread };
+
+    const workerPayload = {
+      data: { pulseId: pulseId, boardId: boardId },
+      chat: createdThread,
+      user: req.user,
+      type: "NEW_REPLY",
+    };
+    new Worker(path.resolve(__dirname, "../workers/notification.js"), {
+      workerData: workerPayload,
+    });
   } catch (error) {
     next(error);
   }

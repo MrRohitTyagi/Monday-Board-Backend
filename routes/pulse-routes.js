@@ -1,9 +1,17 @@
 import { Router } from "express";
+import { Worker } from "worker_threads";
+
 import pulse from "../models/pulse-model.js";
 import sprintModel from "../models/sprint-model.js";
-const pulseRouter = Router();
 
-export const user_fields_tO_send = { email: true, name: true, pk: true };
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Convert import.meta.url to __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const pulseRouter = Router();
 
 pulseRouter.get("/get-all", async (req, res) => {
   try {
@@ -50,10 +58,31 @@ pulseRouter.post("/create", async (req, res) => {
 
 pulseRouter.put("/update/:id", async (req, res) => {
   const { id } = req.params;
-  const body = req.body;
+
+  const { boardId, ...body } = req.body;
+  const assigned = body?.assigned || [];
   try {
-    const updatedPulse = await pulse.findByIdAndUpdate(id, body, { new: true });
-    res.json({ success: true, response: updatedPulse });
+    let updatedPulse = await pulse.findByIdAndUpdate(id, body, { new: true });
+    res.json({ success: true, response: updatedPulse.toObject() });
+
+    if (assigned?.length === 0) return; // other pulse updates
+
+    updatedPulse = await updatedPulse.toObject();
+    updatedPulse = { ...updatedPulse, assigned: [assigned[0]] };
+
+    ///////////////////////WORKER////////////////////////////////////////
+
+    const workerPayload = {
+      data: { boardId: boardId, pulseId: updatedPulse._id.toString() },
+      chat: {},
+      user: req.user,
+      type: "ASSIGNED_TO",
+      updatedPulse: updatedPulse,
+    };
+
+    new Worker(path.resolve(__dirname, "../workers/notification.js"), {
+      workerData: workerPayload,
+    });
   } catch (error) {
     console.log("error", error);
     res.status(500).send({ success: false, message: "something went wrong" });
