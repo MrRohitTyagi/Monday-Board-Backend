@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import threadModel from "../models/thread-model";
+import threadModel from "../models/thread-model.js";
 
 const threadsRouter = Router();
 

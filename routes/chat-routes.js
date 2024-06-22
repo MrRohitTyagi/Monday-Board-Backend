@@ -21,13 +21,7 @@ chatRouter.get("/get/:pulse_id", async (req, res, next) => {
     const chatsBelongsToAPulse = await chatModel
       .find({ pulseId: pulse_id })
       .sort({ createdAt: -1 })
-      .populate([
-        {
-          path: "thread",
-          populate: { path: "createdBy", select: "username picture _id" },
-        },
-        { path: "createdBy", select: "username picture _id" },
-      ]);
+      .populate([{ path: "createdBy", select: "username picture _id" }]);
     res.json({ success: true, response: chatsBelongsToAPulse });
   } catch (error) {
     next(error);
