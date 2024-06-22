@@ -29,25 +29,20 @@ chatRouter.get("/get/:pulse_id", async (req, res, next) => {
 });
 
 chatRouter.post("/create", async (req, res, next) => {
-  const { content, draft, pulseId, seenBy, thread, createdBy } = req.body;
+  const { content, pulseId } = req.body;
 
   const user_id = req.user._id;
 
   try {
     let createdChat = await chatModel.create({
       content,
-      draft,
+
       pulseId,
       seenBy: [user_id],
-      thread,
-      createdBy,
+      createdBy: [user_id],
     });
 
     createdChat = await createdChat.populate([
-      {
-        path: "thread",
-        populate: { path: "createdBy", select: "username picture _id" },
-      },
       { path: "createdBy", select: "username picture _id" },
       { path: "seenBy", select: "username picture _id" },
     ]);

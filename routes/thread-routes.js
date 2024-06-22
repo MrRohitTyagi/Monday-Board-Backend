@@ -59,9 +59,11 @@ threadsRouter.put("/update/:_id", async (req, res, next) => {
   const body = req.body;
 
   try {
-    const updatedChat = await threadModel.findByIdAndUpdate(_id, body, {
-      new: true,
-    });
+    const updatedChat = await threadModel
+      .findByIdAndUpdate(_id, body, {
+        new: true,
+      })
+      .populate({ path: "createdBy", select: "username picture _id" });
 
     res.json({ success: true, response: updatedChat.toObject() });
   } catch (error) {
