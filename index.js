@@ -18,6 +18,7 @@ import connectDatabase from "./configs/db.js";
 import { VerifyToken } from "./utils/jwt.js";
 import errorHandler from "./middlewares/errorhandeling.js";
 import invitationRouter from "./routes/invitation-router.js";
+import aiRouter from "./routes/ai-routes.js";
 
 //configurations
 const app = express();
@@ -40,6 +41,7 @@ app.use("/invitation/", invitationRouter);
 app.use("/auth/", authRouter);
 
 app.use("/user/", VerifyToken, userRouter);
+app.use("/ai/", VerifyToken, aiRouter);
 app.use("/board/", VerifyToken, boardRouter);
 app.use("/pulse/", VerifyToken, pulseRouter);
 app.use("/chat/", VerifyToken, chatRouter);
