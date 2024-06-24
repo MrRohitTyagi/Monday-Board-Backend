@@ -3,8 +3,8 @@ import notificationModel from "../models/notification-model.js";
 
 const notificationRouter = Router();
 
-notificationRouter.get("/get/:user_id", async (req, res, next) => {
-  const { user_id } = req.params;
+notificationRouter.get("/get", async (req, res, next) => {
+  const user_id = req.user._id;
   try {
     const notifications = await notificationModel
       .find({ attachedUser: user_id })
@@ -30,8 +30,9 @@ notificationRouter.delete("/delete/:noti_id", async (req, res, next) => {
   }
 });
 
-notificationRouter.delete("/delete-all/:user_id", async (req, res, next) => {
-  const { user_id } = req.params;
+notificationRouter.delete("/delete-all", async (req, res, next) => {
+  const user_id = req.user._id;
+
   try {
     await notificationModel.deleteMany({ attachedUser: user_id });
     res.json({
@@ -42,8 +43,8 @@ notificationRouter.delete("/delete-all/:user_id", async (req, res, next) => {
     next(error);
   }
 });
-notificationRouter.put("/read-all/:user_id", async (req, res, next) => {
-  const { user_id } = req.params;
+notificationRouter.put("/read-all", async (req, res, next) => {
+  const user_id = req.user._id;
   try {
     await notificationModel.updateMany(
       { attachedUser: user_id },
