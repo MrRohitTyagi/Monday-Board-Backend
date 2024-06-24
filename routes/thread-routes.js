@@ -89,7 +89,6 @@ threadsRouter.delete("/delete/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
     const deletedThread = await threadModel.findByIdAndDelete(id);
-    console.log("deletedThread", deletedThread.toObject());
 
     const chat = await chatModel.findById(deletedThread.chatId.toString());
     chat.threadCount = chat.threadCount - 1;

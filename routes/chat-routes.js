@@ -1,6 +1,7 @@
 import { Router } from "express";
 import chatModel from "../models/chat-model.js";
 import { generateNotification } from "../workers/notification.js";
+import threadModel from "../models/thread-model.js";
 
 const chatRouter = Router();
 
@@ -48,7 +49,7 @@ chatRouter.post("/create", async (req, res, next) => {
     ]);
 
     res.json({ success: true, response: createdChat });
-    
+
     ///////////////////////GENERATE NOTIFICATION////////////////////////////////////////
     createdChat = await createdChat.toObject();
 
@@ -88,6 +89,14 @@ chatRouter.delete("/delete/:id", async (req, res, next) => {
   try {
     await chatModel.findByIdAndDelete(id);
     res.json({ success: true, response: "Chat deleted successfully!" });
+
+    const threadsBelongsToAChat = await threadModel.find({ chatId: id });
+    if ((threadsBelongsToAChat.length = 0)) return;
+
+    const threadsToDeletePromised = threadsBelongsToAChat.map((thread) =>
+      thread.deleteOne()
+    );
+    await Promise.all(threadsToDeletePromised);
   } catch (error) {
     next(error);
   }
