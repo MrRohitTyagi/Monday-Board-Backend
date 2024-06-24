@@ -1,15 +1,8 @@
 import { Router } from "express";
-import { Worker } from "worker_threads";
 import chatModel from "../models/chat-model.js";
+import { generateNotification } from "../workers/notification.js";
 
 const chatRouter = Router();
-
-import path from "path";
-import { fileURLToPath } from "url";
-
-// Convert import.meta.url to __dirname equivalent
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 chatRouter.get("/get-single/:_id", async (req, res, next) => {
   try {
@@ -55,22 +48,22 @@ chatRouter.post("/create", async (req, res, next) => {
     ]);
 
     res.json({ success: true, response: createdChat });
-    ///////////////////////WORKER////////////////////////////////////////
+    
+    ///////////////////////GENERATE NOTIFICATION////////////////////////////////////////
     createdChat = await createdChat.toObject();
 
     createdChat = {
       ...createdChat,
     };
-    const workerPayload = {
+
+    const notificationPayload = {
       data: { pulseId: pulseId, boardId: boardId },
       chat: createdChat,
       user: req.user,
       type: "NEW_UPDATE",
     };
 
-    new Worker(path.resolve(__dirname, "../workers/notification.js"), {
-      workerData: workerPayload,
-    });
+    generateNotification(notificationPayload);
   } catch (error) {
     next(error);
   }

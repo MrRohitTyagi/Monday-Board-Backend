@@ -1,14 +1,11 @@
-import { workerData } from "worker_threads";
-import mongoose from "mongoose";
-
 import notificationModel from "../models/notification-model.js";
 import pulseModel from "../models/pulse-model.js";
 
-async function init() {
+async function generateNotification(notificationPayload) {
   try {
-    const { chat, user: admin, type, data, updatedPulse } = workerData;
+    const { chat, user: admin, type, data, updatedPulse } = notificationPayload;
 
-    await mongoose.connect(process.env.MONGO_URL);
+    // await mongoose.connect(process.env.MONGO_URL);
 
     const pulse = updatedPulse || (await pulseModel.findById(data.pulseId));
 
@@ -24,14 +21,10 @@ async function init() {
       });
       notificationPromises.push(promise);
     }
-    console.log("workerData", workerData);
-    console.log("notificationPromises", notificationPromises);
 
     await Promise.all(notificationPromises);
   } catch (error) {
     console.error("Error creating notification:", error);
-  } finally {
-    await mongoose.connection.close();
   }
 }
 async function createNotification(data) {
@@ -39,7 +32,6 @@ async function createNotification(data) {
   const notification = await notificationModel.create(body);
   console.log("notification", notification);
 }
-init();
 
 function createPyloadBytype({ chat, user, type, data, createdBy, pulse }) {
   let payload = {
@@ -74,3 +66,5 @@ function createPyloadBytype({ chat, user, type, data, createdBy, pulse }) {
 
   return payload;
 }
+
+export { generateNotification };

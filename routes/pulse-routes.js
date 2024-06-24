@@ -1,15 +1,8 @@
 import { Router } from "express";
-import { Worker } from "worker_threads";
 
 import pulse from "../models/pulse-model.js";
 import sprintModel from "../models/sprint-model.js";
-
-import path from "path";
-import { fileURLToPath } from "url";
-
-// Convert import.meta.url to __dirname equivalent
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { generateNotification } from "../workers/notification.js";
 
 const pulseRouter = Router();
 
@@ -70,9 +63,9 @@ pulseRouter.put("/update/:id", async (req, res) => {
     updatedPulse = await updatedPulse.toObject();
     updatedPulse = { ...updatedPulse, assigned: [assigned[0]] };
 
-    ///////////////////////WORKER////////////////////////////////////////
+    ///////////////////////GENERATE NOTIFICATION////////////////////////////////////////
 
-    const workerPayload = {
+    const notificationPayload = {
       data: { boardId: boardId, pulseId: updatedPulse._id.toString() },
       chat: {},
       user: req.user,
@@ -80,9 +73,7 @@ pulseRouter.put("/update/:id", async (req, res) => {
       updatedPulse: updatedPulse,
     };
 
-    new Worker(path.resolve(__dirname, "../workers/notification.js"), {
-      workerData: workerPayload,
-    });
+    generateNotification(notificationPayload);
   } catch (error) {
     console.log("error", error);
     res.status(500).send({ success: false, message: "something went wrong" });

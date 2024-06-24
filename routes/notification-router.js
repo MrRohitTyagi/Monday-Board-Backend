@@ -3,10 +3,10 @@ import notificationModel from "../models/notification-model.js";
 
 const notificationRouter = Router();
 
-notificationRouter.get("/get/:user_id", async (req, res) => {
+notificationRouter.get("/get/:user_id", async (req, res, next) => {
   const { user_id } = req.params;
   try {
-    const singleSprint = await notificationModel
+    const notifications = await notificationModel
       .find({ attachedUser: user_id })
       .sort({ createdAt: -1 })
       .populate([
@@ -14,7 +14,7 @@ notificationRouter.get("/get/:user_id", async (req, res) => {
         { path: "attachedUser", select: "_id picture username" },
         { path: "attachedPulse", select: "_id title" },
       ]);
-    res.json({ success: true, response: singleSprint });
+    res.json({ success: true, response: notifications });
   } catch (error) {
     next(error);
   }
