@@ -20,11 +20,36 @@ notificationRouter.get("/get/:user_id", async (req, res, next) => {
   }
 });
 
-notificationRouter.delete("/delete/:id", async (req, res, next) => {
-  const { id } = req.params;
+notificationRouter.delete("/delete/:noti_id", async (req, res, next) => {
+  const { noti_id } = req.params;
   try {
-    await notificationModel.findByIdAndDelete(id);
+    await notificationModel.findByIdAndDelete(noti_id);
     res.json({ success: true, response: "Notification deleted successfully!" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+notificationRouter.delete("/delete-all/:user_id", async (req, res, next) => {
+  const { user_id } = req.params;
+  try {
+    await notificationModel.deleteMany({ attachedUser: user_id });
+    res.json({
+      success: true,
+      response: "Notifications deleted successfully!",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+notificationRouter.put("/read-all/:user_id", async (req, res, next) => {
+  const { user_id } = req.params;
+  try {
+    await notificationModel.updateMany(
+      { attachedUser: user_id },
+      { seen: true }
+    );
+    res.json({ success: true, response: "All notifications marked as read" });
   } catch (error) {
     next(error);
   }
