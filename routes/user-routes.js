@@ -24,7 +24,12 @@ userRouter.get("/get/:id", async (req, res) => {
   try {
     const singleUser = await user
       .findById(user_id || id)
-      .populate([{ path: "boards", select: "_id picture title" }])
+      .populate([
+        {
+          path: "boards",
+          populate: { path: "members admins",select:'_id username' },
+        },
+      ])
       .select("-password");
 
     res.json({ success: true, response: singleUser });
