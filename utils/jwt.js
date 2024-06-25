@@ -5,7 +5,7 @@ dotenv.config({ path: "./.env.local" });
 const signature = process.env.JWT_SIGNATURE;
 
 export function generateToken(payload) {
-  const token = jwt.sign(payload, signature, { expiresIn: "1d" });
+  const token = jwt.sign(payload, signature);
   return token;
 }
 
