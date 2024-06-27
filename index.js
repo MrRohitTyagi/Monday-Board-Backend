@@ -19,6 +19,7 @@ import { VerifyToken } from "./utils/jwt.js";
 import errorHandler from "./middlewares/errorhandeling.js";
 import invitationRouter from "./routes/invitation-router.js";
 import aiRouter from "./routes/ai-routes.js";
+import configRouter from "./routes/config-routes.js";
 
 //configurations
 const app = express();
@@ -48,6 +49,7 @@ app.use("/chat/", VerifyToken, chatRouter);
 app.use("/thread/", VerifyToken, threadRouter);
 app.use("/sprint/", VerifyToken, sprintRouter);
 app.use("/notification/", VerifyToken, notificationRouter);
+app.use("/config/", VerifyToken, configRouter);
 
 app.use(errorHandler);
 
