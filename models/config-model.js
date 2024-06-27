@@ -1,15 +1,26 @@
 import mongoose from "mongoose";
 
+const filterSchema = new mongoose.Schema(
+  {
+    search: { type: String, default: "" },
+    priority: { type: String, default: "" },
+    status: { type: String, default: "" },
+    user: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
 const userConfigSchema = mongoose.Schema(
   {
     belongsTo: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
     staredBoards: [{ type: String }],
     likedChats: [{ type: String }],
     likedThreads: [{ type: String }],
-    search: { type: String },
-    priority: { type: String },
-    status: { type: String },
-    user: { type: String },
+
+    filters: {
+      type: Map,
+      of: filterSchema,
+    },
   },
   { versionKey: false }
 );

@@ -33,6 +33,26 @@ configRouter.put("/update/:_id", async (req, res, next) => {
     next(error);
   }
 });
+configRouter.put("/update-deep/:_id", async (req, res, next) => {
+  const { _id } = req.params;
+  const { boardID, ...body } = req.body;
+  try {
+    const config = await configModel.findById(_id);
+    let filter = config.filters.get(boardID) || {};
+    filter = { ...filter._doc, ...body };
+    config.filters.set(boardID, filter);
+
+    await config.save();
+
+    res.json({
+      success: true,
+      message: "Config updated successfully",
+    });
+  } catch (error) {
+    console.log("error", error);
+    next(error);
+  }
+});
 
 // configRouter.delete("/delete/:id", async (req, res, next) => {
 //   const { id } = req.params;
