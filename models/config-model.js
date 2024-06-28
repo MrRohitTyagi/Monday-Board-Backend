@@ -16,7 +16,8 @@ const userConfigSchema = mongoose.Schema(
     staredBoards: [{ type: String }],
     likedChats: [{ type: String }],
     likedThreads: [{ type: String }],
-
+    themeID: { type: String },
+    pulseHeight: { type: String },
     filters: {
       type: Map,
       of: filterSchema,
