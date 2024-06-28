@@ -48,9 +48,11 @@ sprintRouter.put("/update/:id", async (req, res) => {
   const { id } = req.params;
   const body = req.body;
   try {
-    const updatedSprint = await sprint.findByIdAndUpdate(id, body, {
-      new: true,
-    });
+    const updatedSprint = await sprint
+      .findByIdAndUpdate(id, body, {
+        new: true,
+      })
+      .populate("pulses");
     res.json({ success: true, response: updatedSprint });
   } catch (error) {
     console.log("error", error);
