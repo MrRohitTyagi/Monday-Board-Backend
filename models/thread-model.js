@@ -7,7 +7,11 @@ const threadSchema = new mongoose.Schema(
       required: [true, "chat reference is required"],
       type: mongoose.Schema.Types.ObjectId,
     },
-
+    pulseId: {
+      ref: "pulse",
+      required: [true, "Pulse reference is required"],
+      type: mongoose.Schema.Types.ObjectId,
+    },
     createdBy: {
       ref: "user",
       required: [true, "User is required"],

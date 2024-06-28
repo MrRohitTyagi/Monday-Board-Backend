@@ -1,6 +1,10 @@
 import { Router } from "express";
 import sprint from "../models/sprint-model.js";
 import boardModel from "../models/board-model.js";
+import pulseModel from "../models/pulse-model.js";
+import chatModel from "../models/chat-model.js";
+import threadModel from "../models/thread-model.js";
+
 const sprintRouter = Router();
 
 export const user_fields_tO_send = { email: true, name: true, pk: true };
@@ -63,8 +67,23 @@ sprintRouter.put("/update/:id", async (req, res) => {
 sprintRouter.delete("/delete/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    await sprint.findByIdAndDelete(id);
-    res.json({ success: true, response: "Pulse deleted successfully!" });
+    const deletedSprint = await sprint.findByIdAndDelete(id);
+    const promises = [];
+
+    deletedSprint.pulses.forEach((p) => {
+      promises.push(pulseModel.findByIdAndDelete(p.toString()));
+      promises.push(chatModel.deleteMany({ pulseId: p.toString() }));
+      promises.push(threadModel.deleteMany({ pulseId: p.toString() }));
+    });
+
+    const board = await boardModel.findOne({ sprints: id });
+    board.sprints = board.sprints.filter((s) => s.toString() !== id);
+
+    promises.push(board.save());
+
+    await Promise.all(promises);
+
+    res.json({ success: true, response: "Sprint deleted successfully!" });
   } catch (error) {
     console.log("error", error);
     res.status(500).send({ success: false, message: "something went wrong" });

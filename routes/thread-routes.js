@@ -39,6 +39,7 @@ threadsRouter.post("/create", async (req, res, next) => {
       content,
       chatId: chat_id,
       createdBy: [user_id],
+      pulseId: pulseId,
     });
 
     const chat = await chatModel.findById(chat_id);
