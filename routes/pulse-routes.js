@@ -3,6 +3,7 @@ import { Router } from "express";
 import pulse from "../models/pulse-model.js";
 import sprintModel from "../models/sprint-model.js";
 import { generateNotification } from "../workers/notification.js";
+import chatModel from "../models/chat-model.js";
 
 const pulseRouter = Router();
 
@@ -84,6 +85,7 @@ pulseRouter.delete("/delete/:id", async (req, res) => {
   const { id } = req.params;
   try {
     await pulse.findByIdAndDelete(id);
+    await chatModel.deleteMany({ pulseId: id });
     res.json({ success: true, response: "Pulse deleted successfully!" });
   } catch (error) {
     console.log("error", error);
