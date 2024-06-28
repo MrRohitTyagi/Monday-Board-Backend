@@ -22,6 +22,7 @@ const userConfigSchema = mongoose.Schema(
       type: Map,
       of: filterSchema,
     },
+    collapsedSprints: [{ type: String, default: [] }],
   },
   { versionKey: false }
 );
