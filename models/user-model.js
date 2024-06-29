@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema(
       match: [/.+\@.+\..+/, "Please enter a valid email address"],
     },
     picture: { type: String },
-    org: { type: String },
     boards: [{ ref: "board", type: mongoose.Schema.ObjectId, default: [] }],
     createdAt: {
       type: Date,

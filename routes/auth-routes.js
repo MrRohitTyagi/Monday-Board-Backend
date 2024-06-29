@@ -51,9 +51,9 @@ authRouter.post("/login", async (req, res, next) => {
 });
 
 authRouter.post("/signup", async (req, res, next) => {
-  const { username, email, password, org, picture } = req.body;
+  const { username, email, password, picture } = req.body;
   try {
-    const payload = { username, email, password, org, picture };
+    const payload = { username, email, password, picture };
 
     let user = await userModel.create(payload);
 
