@@ -16,14 +16,13 @@ const model = genAI.getGenerativeModel({
 });
 
 aiRouter.post("/generate", async (req, res) => {
-  const { prompt, pulseID } = req.body;
+  const { prompt } = req.body;
   try {
     const result = await model.generateContent(prompt);
     const response = result.response;
     const text = response.text();
 
     res.status(200).send({ success: true, message: text });
-
   } catch (error) {
     res.status(400).send({
       success: false,
