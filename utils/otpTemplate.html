@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTP</title>
+  </head>
+  <body>
+    <table
+      style="
+        border-spacing: 0;
+        border-collapse: collapse;
+        width: 100%;
+        vertical-align: top;
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 0;
+        font-size: 15px;
+        font-family: Arial, Helvetica;
+      "
+    >
+      <tbody>
+        <tr>
+          <td>
+            <table
+              cellspacing="0"
+              cellpadding="0"
+              style="font-family: Arial, Helvetica, sans-serif; width: 100%"
+            >
+              <tbody style="text-align: center; width: 100%">
+                <tr>
+                  <td>
+                    <h3 style="text-align: center; opacity: 0.7">Hi ${user}</h3>
+
+                    <h4 style="text-align: center; opacity: 0.7">
+                      Here is your one time password for cassword change request
+                    </h4>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              "
+            >
+              <button
+                style="
+                  text-decoration: none;
+                  display: inline-block;
+                  color: rgb(255, 255, 255);
+                  border-radius: 4px;
+                  border: none;
+                  border-bottom: 2px solid rgb(0, 164, 98);
+                  background: #133774;
+                  padding: 15px 40px;
+                  margin: 10px auto;
+                  font-size: 18px;
+                "
+              >
+                ${otp}
+              </button>
+            </div>
+            <h4 style="text-align: center; opacity: 0.7">
+              This OTP will automatically expire in 5 minutes
+            </h4>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

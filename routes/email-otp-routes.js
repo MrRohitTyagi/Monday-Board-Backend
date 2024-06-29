@@ -15,38 +15,41 @@ const emailRouter = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-emailRouter.post("/send-otp", async (req, res) => {
-  try {
-    const { email } = req.body;
-    const stamp = Date.now().toString();
-    const token = stamp.substring(stamp.length - 4);
+// emailRouter.post("/send-otp", async (req, res) => {
+//   try {
+//     const { email } = req.body;
+//     const stamp = Date.now().toString();
+//     const token = stamp.substring(stamp.length - 4);
 
-    await OTP.create({ email, token, isActive: true });
-    sendMail(token, email);
-    res.send({ success: true, msg: "Token sent successfully" });
-  } catch (error) {
-    console.log("error", error);
-  }
-});
+//     await OTP.create({ email, token, isActive: true });
+//     sendMail(token, email);
+//     res.send({ success: true, message: "Token sent successfully" });
+//   } catch (error) {
+//     console.log("error", error);
+//   }
+// });
 
 emailRouter.post("/verify-otp", async (req, res) => {
+  const { _id: user_id } = req.user;
   try {
-    const { email, token } = req.body;
-    const response = await OTP.findOne({ email, token });
-    console.log("response", response);
+    const { otp } = req.body;
+    const response = await OTP.findOne({ user_id: user_id, otp: otp });
+
     if (!response) {
-      res.status(400).send({ success: true, msg: "Please enter correct otp" });
+      res
+        .status(400)
+        .send({ success: false, message: "Please enter correct otp" });
     }
 
     if (response.isActive) {
       await OTP.findByIdAndUpdate(response._id.toString(), {
         isActive: false,
       });
-      res.send({ success: true, msg: "OTP varification successfull" });
+      res.send({ success: true, message: "Varification successfull" });
     } else {
       res.status(400).send({
-        success: true,
-        msg: "This top is Expired please genrate new otp",
+        success: false,
+        message: "This top is Expired please genrate new one and try again",
       });
     }
   } catch (error) {

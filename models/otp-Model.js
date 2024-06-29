@@ -2,8 +2,12 @@ import mongoose, { Schema } from "mongoose";
 
 const otpschema = new Schema(
   {
-    email: { type: String, required: true },
-    token: { type: String, required: true },
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: [true, "user Id is required"],
+      ref: "user",
+    },
+    otp: { type: String, required: true },
     isActive: {
       type: Boolean,
       default: true,

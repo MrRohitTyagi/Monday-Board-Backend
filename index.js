@@ -37,10 +37,10 @@ app.get("/", (req, res) => {
   res.send("hello");
 });
 
-app.use("/email/", emailRouter);
-app.use("/invitation/", invitationRouter);
 app.use("/auth/", authRouter);
+app.use("/invitation/", invitationRouter);
 
+app.use("/email/", VerifyToken, emailRouter);
 app.use("/user/", VerifyToken, userRouter);
 app.use("/ai/", VerifyToken, aiRouter);
 app.use("/board/", VerifyToken, boardRouter);
