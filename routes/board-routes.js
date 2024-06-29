@@ -71,4 +71,29 @@ boardRouter.delete("/delete/:id", async (req, res) => {
   }
 });
 
+boardRouter.get("/get-assigned/", async (req, res) => {
+  const { _id } = req.user;
+  try {
+    const singleBoard = await board
+      .find({
+        $or: [{ admins: _id }, { members: _id }],
+      })
+      .populate([
+        { path: "admins", select: "_id picture username" },
+        { path: "members", select: "_id picture username" },
+        {
+          path: "sprints",
+          populate: {
+            path: "pulses",
+          },
+        },
+      ]);
+
+    res.json({ success: true, response: singleBoard });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).send({ success: false, message: "something went wrong" });
+  }
+});
+
 export default boardRouter;
