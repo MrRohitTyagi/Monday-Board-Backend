@@ -19,6 +19,7 @@ const userConfigSchema = mongoose.Schema(
     themeID: { type: String },
     pulseHeight: { type: String },
     filters: {
+      default: {},
       type: Map,
       of: filterSchema,
     },

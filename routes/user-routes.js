@@ -1,5 +1,6 @@
 import { Router } from "express";
 import user from "../models/user-model.js";
+import { throwEarlyError } from "../middlewares/errorhandeling.js";
 const userRouter = Router();
 
 export const user_fields_tO_send = { email: true, name: true, pk: true };
@@ -19,18 +20,25 @@ userRouter.get("/get-all", async (req, res) => {
 });
 
 userRouter.get("/get/:id", async (req, res) => {
-  const { id } = req.params;
   const user_id = req?.user?._id;
   try {
     const singleUser = await user
-      .findById(user_id || id)
+      .findById(user_id)
       .populate([
         {
           path: "boards",
-          populate: { path: "members admins",select:'_id username' },
+          populate: { path: "members admins", select: "_id username" },
         },
       ])
       .select("-password");
+
+    if (!singleUser) {
+      return throwEarlyError({
+        res,
+        message: "User not fount , please login again",
+        status: 401,
+      });
+    }
 
     res.json({ success: true, response: singleUser });
   } catch (error) {
