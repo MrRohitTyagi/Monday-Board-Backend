@@ -78,13 +78,14 @@ boardRouter.get("/get-assigned/", async (req, res) => {
       .find({
         $or: [{ admins: _id }, { members: _id }],
       })
+      .select("_id title sprints picture")
       .populate([
-        { path: "admins", select: "_id picture username" },
-        { path: "members", select: "_id picture username" },
         {
           path: "sprints",
           populate: {
+            match: { assigned: _id },
             path: "pulses",
+            select: "title _id",
           },
         },
       ]);
