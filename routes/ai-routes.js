@@ -4,9 +4,9 @@ const aiRouter = Router();
 
 const generationConfig = {
   // maxOutputTokens: 100,
-  //   temperature: 0,
-  //   topP: 0.1,
-  //   topK: 16,
+  temperature: 0,
+  topP: 0.1,
+  topK: 16,
 };
 const KEY = process.env.GEMINI_KEY;
 const genAI = new GoogleGenerativeAI(KEY);
