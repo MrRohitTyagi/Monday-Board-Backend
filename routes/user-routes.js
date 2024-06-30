@@ -39,7 +39,11 @@ userRouter.get("/get/:id", async (req, res) => {
       .populate([
         {
           path: "boards",
-          populate: { path: "members admins", select: "_id username" },
+          populate: [
+            { path: "members", select: "_id username" },
+            { path: "admins", select: "_id username" },
+            { path: "sprints", select: "_id title color" },
+          ],
         },
       ])
       .select("-password");

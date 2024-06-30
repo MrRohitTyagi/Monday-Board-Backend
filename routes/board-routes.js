@@ -22,6 +22,7 @@ boardRouter.get("/get/:id", async (req, res) => {
     const singleBoard = await board.findById(id).populate([
       { path: "admins", select: "_id picture username" },
       { path: "members", select: "_id picture username" },
+      { path: "sprints", select: "-pulses" },
     ]);
 
     res.json({ success: true, response: singleBoard });
