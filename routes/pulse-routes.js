@@ -92,5 +92,25 @@ pulseRouter.delete("/delete/:id", async (req, res) => {
     res.status(500).send({ success: false, message: "something went wrong" });
   }
 });
+pulseRouter.delete("/delete-bulk/", async (req, res) => {
+  const { pulses } = req.body;
+  const promises = [];
+
+  try {
+    for (const pulseID of pulses) {
+      promises.push(pulse.findByIdAndDelete(pulseID));
+      promises.push(chatModel.deleteMany({ pulseId: pulseID }));
+    }
+    await Promise.all(promises);
+
+    res.json({
+      success: true,
+      response: "Pulses deleted successfully!",
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).send({ success: false, message: "something went wrong" });
+  }
+});
 
 export default pulseRouter;
