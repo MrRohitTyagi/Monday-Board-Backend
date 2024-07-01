@@ -92,6 +92,7 @@ pulseRouter.delete("/delete/:id", async (req, res) => {
     res.status(500).send({ success: false, message: "something went wrong" });
   }
 });
+
 pulseRouter.delete("/delete-bulk/", async (req, res) => {
   const { pulses } = req.body;
   const promises = [];
@@ -106,6 +107,51 @@ pulseRouter.delete("/delete-bulk/", async (req, res) => {
     res.json({
       success: true,
       response: "Pulses deleted successfully!",
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).send({ success: false, message: "something went wrong" });
+  }
+});
+
+pulseRouter.put("/move-bulk/", async (req, res) => {
+  const { pulses, toSprint } = req.body;
+  const promises = [];
+
+  try {
+    const sprintsConfig = {};
+
+    for (const pulse of pulses) {
+      sprintsConfig[pulse.sprintID] = [
+        ...(sprintsConfig[pulse.sprintID] || []),
+        pulse._id,
+      ];
+    }
+
+    for (const sprintID in sprintsConfig) {
+      const eachSprint = await sprintModel.findById(sprintID);
+
+      eachSprint.pulses = [...eachSprint.pulses].filter((p) => {
+        if (sprintsConfig[sprintID].includes(p.toString())) {
+          return false;
+        } else return true;
+      });
+      promises.push(eachSprint.save());
+    }
+
+    const addToSprint = await sprintModel.findById(toSprint);
+
+    const unique = Array.from(
+      new Set([...addToSprint.pulses, ...pulses.map((p) => p._id)])
+    );
+    addToSprint.pulses = [...unique];
+    promises.push(addToSprint.save());
+
+    await Promise.all(promises);
+
+    res.json({
+      success: true,
+      response: "Pulses moved successfully!",
     });
   } catch (error) {
     console.log("error", error);
