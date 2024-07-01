@@ -1,17 +1,6 @@
 import { Router } from "express";
 import user from "../models/user-model.js";
 import { throwEarlyError } from "../middlewares/errorhandeling.js";
-import { comparePassword } from "../utils/bcrypt.js";
-import otpModel from "../models/otp-Model.js";
-import { sendMail } from "../utils/email.js";
-import { generateOtp } from "../utils/otp.js";
-
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const userRouter = Router();
 
@@ -104,56 +93,6 @@ userRouter.delete("/delete/:id", async (req, res) => {
   try {
     await user.findByIdAndDelete(id);
     res.json({ success: true, response: "User deleted successfully!" });
-  } catch (error) {
-    console.log("error", error);
-    res.status(500).send({
-      success: false,
-      message: error.message || "something went wrong",
-    });
-  }
-});
-
-userRouter.post("/change-password", async (req, res) => {
-  const { _id: user_id, email, username } = req?.user;
-
-  const { password } = req.body;
-  try {
-    const singleUser = await user.findById(user_id);
-
-    const isPassSame = await comparePassword(
-      password,
-      singleUser.toObject().password
-    );
-
-    if (isPassSame === false) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Password is incorrect, please check your password and try again",
-      });
-    }
-    const otp = generateOtp();
-
-    await otpModel.deleteMany({ user_id: user_id });
-
-    await otpModel.create({ user_id: user_id, otp: otp, isActive: true });
-
-    res.json({ success: true });
-
-    let htmlTemplate = fs.readFileSync(
-      path.join(__dirname, "../utils/otpTemplate.html"),
-      "utf-8"
-    );
-
-    htmlTemplate = htmlTemplate
-      .replace("${user}", username)
-      .replace("${otp}", otp);
-
-    sendMail({
-      to: email,
-      subject: "One time password for account password change",
-      html: htmlTemplate,
-    });
   } catch (error) {
     console.log("error", error);
     res.status(500).send({
