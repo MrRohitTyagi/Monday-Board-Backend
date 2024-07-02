@@ -30,7 +30,17 @@ pulseRouter.get("/get/:id", async (req, res) => {
 });
 
 pulseRouter.post("/create", async (req, res) => {
-  const { priority, status, tag, timeline, title, sprint: sprintID } = req.body;
+  const {
+    priority,
+    status,
+    tag,
+    timeline,
+    title,
+    //
+    _id: pulse_id,
+    sprint: sprintID,
+    WITH_UPDATES,
+  } = req.body;
   try {
     const createdPulse = await pulse.create({
       priority,
@@ -39,11 +49,38 @@ pulseRouter.post("/create", async (req, res) => {
       timeline,
       title,
     });
+
     const sprint = await sprintModel.findById(sprintID);
-    sprint.pulses = [...sprint.pulses, createdPulse._id.toString()];
+
+    if (pulse_id) {
+      const tempPs = [];
+      for (const mainPulse of sprint.pulses) {
+        if (mainPulse.toString() === pulse_id) {
+          tempPs.push(mainPulse);
+          tempPs.push(createdPulse._id);
+        } else tempPs.push(mainPulse);
+      }
+      sprint.pulses = [...tempPs];
+    } else {
+      sprint.pulses = [...sprint.pulses, createdPulse._id.toString()];
+    }
+
     await sprint.save();
 
     res.json({ success: true, response: createdPulse });
+
+    if (!WITH_UPDATES) return;
+    const promises = [];
+
+    const relatedChats = await chatModel.find({ pulseId: pulse_id });
+    relatedChats.forEach((oldchat) => {
+      const { _id, ...rest } = oldchat.toObject();
+
+      let p = chatModel.create({ ...rest, pulseId: createdPulse._id });
+      promises.push(p);
+    });
+
+    await Promise.all(promises);
   } catch (error) {
     console.log("error", error);
     res.status(500).send({ success: false, message: "something went wrong" });
